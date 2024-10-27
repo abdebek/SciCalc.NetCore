@@ -1,10 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+		<!-- NuGet package metadata -->
+		<PackageId>SciCalc</PackageId>
+		<Version>0.0.1</Version>
+		<Authors>Abd. Bek.</Authors>
+		<Company>Waanfeetan LLC</Company>
+		<Description>A scientific calculator library with support for significant figures calculations (for educational purpose only).</Description>
+		<Copyright>Copyright © 2024 Waanfeetan LLC</Copyright>
+		<PackageTags>calculator, scientific, significant figures, math</PackageTags>
+		<RepositoryUrl>https://github.com/abdebek/SciCalc.NetCore</RepositoryUrl>
 
+		<!-- Optional package settings -->
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryType>git</RepositoryType>
+		<PackageProjectUrl>https://github.com/abdebek/SciCalc.NetCore</PackageProjectUrl>
+		<PackageIcon>assets/icon.png</PackageIcon>
+		<!-- Optional: path to an icon file in your project -->
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+	</PropertyGroup>
+
+	<!-- Include the icon in the package -->
+	<ItemGroup>
+		<None Update="assets/icon.png" Pack="true" PackagePath=""/>
+	</ItemGroup>
 </Project>
