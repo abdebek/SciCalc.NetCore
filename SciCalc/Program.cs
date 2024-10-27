@@ -1,110 +1,178 @@
-﻿using static ScientificCalculator.SignificantFigures;
+﻿using System.Text.RegularExpressions;
+using static ScientificCalculator.SignificantFigures;
 
 namespace ScientificCalculator;
 
 public class SignificantFigures
 {
-    /// <summary>
-    /// Represents a number with its significant figures
-    /// </summary>
     public class SignificantNumber
     {
         public double Value { get; private set; }
         public int SignificantDigits { get; private set; }
+        public int DecimalPlaces { get; private set; }
 
-        public SignificantNumber(double value, int significantDigits)
+        public SignificantNumber(double value, int significantDigits, int decimalPlaces)
         {
             Value = value;
             SignificantDigits = significantDigits;
+            DecimalPlaces = decimalPlaces;
         }
 
+        /// <summary>
+        /// Parses the specified number.
+        /// </summary>
+        /// <param name="number">The number.</param>
+        /// <returns></returns>
         public static SignificantNumber Parse(string number)
         {
-            // Remove any leading/trailing whitespace
-            number = number.Trim();
+            number = number.Trim().ToLower();
 
             // Handle scientific notation
-            if (number.Contains("e") || number.Contains("E"))
+            if (number.Contains('e'))
             {
-                var parts = number.Split(new[] { 'e', 'E' });
+                var parts = number.Split('e');
                 var mantissa = parts[0];
+                var exponent = int.Parse(parts[1]);
                 var significantDigits = CountSignificantFigures(mantissa);
-                return new SignificantNumber(double.Parse(number), significantDigits);
+                var value = double.Parse(number);
+                var decimalPlaces = GetDecimalPlaces(mantissa) - exponent;
+                return new SignificantNumber(value, significantDigits, decimalPlaces);
             }
 
-            var significantFigures = CountSignificantFigures(number);
-            return new SignificantNumber(double.Parse(number), significantFigures);
+            var sigFigs = CountSignificantFigures(number);
+            var decPlaces = GetDecimalPlaces(number);
+            return new SignificantNumber(double.Parse(number), sigFigs, decPlaces);
         }
 
+        /// <summary>
+        /// Counts the significant figures.
+        /// </summary>
+        /// <param name="number">The number.</param>
+        /// <returns></returns>
         public static int CountSignificantFigures(string number)
         {
-            // Remove decimal point and leading zeros
-            number = number.Replace(".", "").TrimStart('0');
+            number = number.Trim().ToLower();
+            if (number.Contains('e'))
+                number = number.Split('e')[0];
 
-            // Count trailing zeros only if there was a decimal point
-            if (number.Contains("."))
-                return number.TrimEnd('0').Length;
+            // Remove decimal point
+            number = number.Replace(".", "");
 
-            return number.TrimEnd('0').Length;
+            // Remove leading zeros
+            number = number.TrimStart('0');
+
+            // Match all significant digits
+            var match = Regex.Match(number, @"^([1-9][0-9]*?)(0*)$");
+            if (match.Success)
+            {
+                var nonZero = match.Groups[1].Value;
+                var trailingZeros = match.Groups[2].Value;
+
+                // If original number had decimal point, include trailing zeros
+                if (number.Contains('.'))
+                    return nonZero.Length + trailingZeros.Length;
+
+                return nonZero.Length;
+            }
+
+            return number.Length;
+        }
+
+        private static int GetDecimalPlaces(string number)
+        {
+            var parts = number.Split('.');
+            return parts.Length > 1 ? parts[1].Length : 0;
+        }
+
+        /// <summary>
+        /// Converts to string.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            return Value.ToString($"F{DecimalPlaces}");
         }
     }
 
     public class Calculator
     {
         /// <summary>
-        /// Adds two numbers following significant figure rules
+        /// Adds the specified a.
         /// </summary>
+        /// <param name="a">a.</param>
+        /// <param name="b">The b.</param>
+        /// <returns></returns>
         public static SignificantNumber Add(SignificantNumber a, SignificantNumber b)
         {
             var sum = a.Value + b.Value;
-            // In addition/subtraction, result should have same decimal places as least precise number
-            var decimalPlacesA = GetDecimalPlaces(a.Value);
-            var decimalPlacesB = GetDecimalPlaces(b.Value);
-            var resultDecimals = Math.Min(decimalPlacesA, decimalPlacesB);
+            // For addition/subtraction, result should have same number of decimal places
+            // as the least precise number
+            var resultDecimals = Math.Min(a.DecimalPlaces, b.DecimalPlaces);
             var rounded = Math.Round(sum, resultDecimals);
-            return new SignificantNumber(rounded, SignificantNumber.CountSignificantFigures(rounded.ToString()));
+
+            // Format the number to get correct string representation
+            var resultStr = rounded.ToString($"F{resultDecimals}");
+            return SignificantNumber.Parse(resultStr);
         }
 
         /// <summary>
-        /// Multiplies two numbers following significant figure rules
+        /// Subtracts the specified a.
         /// </summary>
+        /// <param name="a">a.</param>
+        /// <param name="b">The b.</param>
+        /// <returns></returns>
+        public static SignificantNumber Subtract(SignificantNumber a, SignificantNumber b)
+        {
+            var diff = a.Value - b.Value;
+            var resultDecimals = Math.Min(a.DecimalPlaces, b.DecimalPlaces);
+            var rounded = Math.Round(diff, resultDecimals);
+            var resultStr = rounded.ToString($"F{resultDecimals}");
+            return SignificantNumber.Parse(resultStr);
+        }
+
+        /// <summary>
+        /// Multiplies the specified a.
+        /// </summary>
+        /// <param name="a">a.</param>
+        /// <param name="b">The b.</param>
+        /// <returns></returns>
         public static SignificantNumber Multiply(SignificantNumber a, SignificantNumber b)
         {
             var product = a.Value * b.Value;
-            // In multiplication/division, result should have same number of significant figures as least precise number
+            // For multiplication/division, result should have same number of significant figures
+            // as the least precise number
             var resultSigFigs = Math.Min(a.SignificantDigits, b.SignificantDigits);
             var rounded = RoundToSignificantFigures(product, resultSigFigs);
-            return new SignificantNumber(rounded, resultSigFigs);
+            var resultStr = rounded.ToString($"G{resultSigFigs}");
+            return SignificantNumber.Parse(resultStr);
         }
 
         /// <summary>
-        /// Divides two numbers following significant figure rules
+        /// Divides the specified a.
         /// </summary>
+        /// <param name="a">a.</param>
+        /// <param name="b">The b.</param>
+        /// <returns></returns>
+        /// <exception cref="System.DivideByZeroException"></exception>
         public static SignificantNumber Divide(SignificantNumber a, SignificantNumber b)
         {
-            if (Math.Abs(b.Value) < double.Epsilon)
-                throw new DivideByZeroException();
+            try
+            {
+                if (Math.Abs(b.Value) < double.Epsilon)
+                    throw new DivideByZeroException();
 
-            var quotient = a.Value / b.Value;
-            var resultSigFigs = Math.Min(a.SignificantDigits, b.SignificantDigits);
-            var rounded = RoundToSignificantFigures(quotient, resultSigFigs);
-            return new SignificantNumber(rounded, resultSigFigs);
-        }
-
-        /// <summary>
-        /// Calculates power following significant figure rules
-        /// </summary>
-        public static SignificantNumber Power(SignificantNumber baseNum, double exponent)
-        {
-            var result = Math.Pow(baseNum.Value, exponent);
-            return new SignificantNumber(result, baseNum.SignificantDigits);
-        }
-
-        private static int GetDecimalPlaces(double number)
-        {
-            var str = number.ToString("G17");
-            var decimalIndex = str.IndexOf('.');
-            return decimalIndex == -1 ? 0 : str.Length - decimalIndex - 1;
+                var quotient = a.Value / b.Value;
+                var resultSigFigs = Math.Min(a.SignificantDigits, b.SignificantDigits);
+                var rounded = RoundToSignificantFigures(quotient, resultSigFigs);
+                var resultStr = rounded.ToString($"G{resultSigFigs}");
+                return SignificantNumber.Parse(resultStr);
+            }
+            catch (DivideByZeroException)
+            {
+                return new SignificantNumber(double.NaN, 0, 0);
+            }
         }
 
         private static double RoundToSignificantFigures(double number, int significantFigures)
@@ -112,8 +180,9 @@ public class SignificantFigures
             if (number == 0)
                 return 0;
 
-            var scale = Math.Pow(10, Math.Floor(Math.Log10(Math.Abs(number))) + 1);
-            return scale * Math.Round(number / scale, significantFigures - 1);
+            var order = Math.Floor(Math.Log10(Math.Abs(number)));
+            var scale = Math.Pow(10, order - significantFigures + 1);
+            return Math.Round(number / scale) * scale;
         }
     }
 }
@@ -123,17 +192,26 @@ public class Program
 {
     public static void Main()
     {
-        var num1 = SignificantNumber.Parse("12.1034");
-        var num2 = SignificantNumber.Parse("5.67");
+        var tests = new[]
+        {
+            ("1.23", "4.56"),        // Same decimal places
+            ("12.1034", "5.67"),     // Different decimal places
+            ("1.234e3", "5.67"),     // Scientific notation
+            ("1200", "1.23"),        // Trailing zeros
+            ("0.00120", "1.23"),     // Leading zeros
+            ("0.00120", "0.000123"), // Very small numbers
+        };
 
-        var sum = Calculator.Add(num1, num2);
-        var product = Calculator.Multiply(num1, num2);
-        var quotient = Calculator.Divide(num1, num2);
-        var power = Calculator.Power(num1, 2.0);
+        foreach (var (n1, n2) in tests)
+        {
+            var num1 = SignificantNumber.Parse(n1);
+            var num2 = SignificantNumber.Parse(n2);
 
-        Console.WriteLine($"Sum: {sum.Value}");
-        Console.WriteLine($"Product: {product.Value}");
-        Console.WriteLine($"Quotient: {quotient.Value}");
-        Console.WriteLine($"Power: {power.Value}");
+            Console.WriteLine($"{n1} + {n2} = {Calculator.Add(num1, num2).Value}");
+            Console.WriteLine($"{n1} - {n2} = {Calculator.Subtract(num1, num2).Value}");
+            Console.WriteLine($"{n1} × {n2} = {Calculator.Multiply(num1, num2).Value}");
+            Console.WriteLine($"{n1} ÷ {n2} = {Calculator.Divide(num1, num2).Value}");
+            Console.WriteLine();
+        }
     }
 }
