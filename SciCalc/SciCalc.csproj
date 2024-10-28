@@ -28,6 +28,10 @@
 	<!-- Include the icon and readme in the package -->
 	<ItemGroup>
 		<None Update="assets/icon.png" Pack="true" PackagePath="" />
+		<None Update="README - Copy.md">
+		  <PackagePath></PackagePath>
+		  <Pack>true</Pack>
+		</None>
 		<None Update="README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 </Project>
