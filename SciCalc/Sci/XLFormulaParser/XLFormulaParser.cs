@@ -17,8 +17,33 @@ public partial class Sci
         {
             functions = new Dictionary<string, Func<List<double>, double>>
         {
-            {"SUM", values => values.Sum()},
-            {"SUBTRACT", values => values.Skip(1).Aggregate(values.First(), (acc, val) => acc - val) },
+            {"SUM", values => values.Skip(1).Aggregate(values.First(), (acc, val) =>
+            {
+                var num1 = SignificantNumber.Parse(acc.ToString());
+                var num2 = SignificantNumber.Parse(val.ToString());
+
+                return Calculator.Add(num1, num2).Value;
+            })},
+            {"SUBTRACT", values => values.Skip(1).Aggregate(values.First(), (acc, val) =>
+            {
+                var num1 = SignificantNumber.Parse(acc.ToString());
+                var num2 = SignificantNumber.Parse(val.ToString());
+                return Calculator.Subtract(num1, num2).Value;
+            })},
+            {"PRODUCT", values => values.Skip(1).Aggregate(values.First(), (acc, val) =>
+            {
+                var num1 = SignificantNumber.Parse(acc.ToString());
+                var num2 = SignificantNumber.Parse(val.ToString());
+                return Calculator.Multiply(num1, num2).Value;
+            })},
+            {"DIVIDE", values => values.Skip(1).Aggregate(values.First(), (acc, val) =>
+            {
+                var num1 = SignificantNumber.Parse(acc.ToString());
+                var num2 = SignificantNumber.Parse(val.ToString());
+                return Calculator.Divide(num1, num2).Value;
+            })},
+            //TODO: This one and all the following functions need to be re-implemented
+            //using SignificantNumber and Calculator wherever necessary
             {"AVERAGE", values => values.Average()},
             {"COUNT", values => values.Count},
             {"MAX", values => values.Max()},
@@ -49,7 +74,6 @@ public partial class Sci
             {"CEILING", values => Math.Ceiling(values[0])},
             {"FLOOR", values => Math.Floor(values[0])},
             {"MOD", values => values[0] % values[1]},
-            {"PRODUCT", values => values.Aggregate(1.0, (acc, val) => acc * val)}
         };
 
             lookupFunctions = new Dictionary<string, Func<List<object>, object>>();
