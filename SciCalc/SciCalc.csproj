@@ -7,13 +7,14 @@
 
 		<!-- NuGet package metadata -->
 		<PackageId>SciCalc</PackageId>
-		<Version>0.0.7</Version>
+		<Version>0.1.0</Version>
 		<Authors>Abd. Bek.</Authors>
 		<Company>Waanfeetan LLC</Company>
 		<Description>A scientific calculator library with support for significant figures calculations (for educational purpose only).</Description>
 		<Copyright>Copyright © 2024 Waanfeetan LLC</Copyright>
 		<PackageTags>calculator, scientific, significant figures, math</PackageTags>
 		<RepositoryUrl>https://github.com/abdebek/SciCalc.NetCore</RepositoryUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 
 		<!-- Optional package settings -->
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -24,8 +25,9 @@
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 
-	<!-- Include the icon in the package -->
+	<!-- Include the icon and readme in the package -->
 	<ItemGroup>
 		<None Update="assets/icon.png" Pack="true" PackagePath="" />
+		<None Update="README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 </Project>

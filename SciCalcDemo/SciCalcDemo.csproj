@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SciCalc" Version="0.0.7" />
+		<PackageReference Include="SciCalc" Version="0.1.0" />
 	</ItemGroup>
 
 </Project>
