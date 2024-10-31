@@ -42,7 +42,10 @@ public partial class Sci
             int scaleB = GetScale(b);
             long scaledA = ScaleToLong(a, scaleA);
             long scaledB = ScaleToLong(b, scaleB);
-            return UnScaleFromLong(scaledA * scaledB, scaleA + scaleB);
+            var result = UnScaleFromLong(scaledA * scaledB, scaleA + scaleB);
+            var resultScale = GetScale(result);
+
+            return resultScale <= 9 ? result : T.CreateChecked(Math.Round(Convert.ToDecimal(result), 9, MidpointRounding.AwayFromZero));
         }
 
         /// <summary>
@@ -57,14 +60,9 @@ public partial class Sci
             }
 
             var result = Convert.ToDecimal(a) / Convert.ToDecimal(b);
-
             var resultScale = GetDecimalScale(result);
-            if (resultScale > 9)
-            {
-                result = Math.Round(result, 9);
-            }
 
-            return T.CreateChecked(result);
+            return resultScale <= 9 ? T.CreateChecked(result) : T.CreateChecked(Math.Round(result, 9, MidpointRounding.AwayFromZero));
         }
 
         /// <summary>

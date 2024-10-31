@@ -35,6 +35,16 @@ public static class TestData
                 68.626278
             ),
             (
+                "PRODUCT(A1:A2)",
+                new Dictionary<string, double> { { "A1", 12.10342345 }, { "A2", 5.67 } },
+                68.62641094
+            ),
+            (
+                "PRODUCT(A1:A2)",
+                new Dictionary<string, double> { { "A1", 121.10342345 }, { "A2", 5.67 } },
+                686.6564109
+            ),
+            (
                 "DIVIDE(A1:A2)",
                 new Dictionary<string, double> { { "A1", 12.1034 }, { "A2", 5.67 } },
                 2.134638448 // 12.1034 / 5.67 as computed by excel
@@ -43,7 +53,12 @@ public static class TestData
                 "DIVIDE(B1:B2)",
                 new Dictionary<string, double> { { "B1", 0.1234 }, { "B2", 1.1 } },
                 0.112181818 // 0.1234 / 1.1 as computed by excel
-            )
+            ),
+            (
+                "DIVIDE(A1:A2)",
+                new Dictionary<string, double> { { "A1", 12.10342345 }, { "A2", 5.67 } },
+                2.134642583
+            ),
         };
 
     // Helper to generate sequential cells with incrementing values
@@ -57,4 +72,3 @@ public static class TestData
         return cells;
     }
 }
-
