@@ -8,8 +8,8 @@
 		<license type="expression">MIT</license>
 		<projectUrl>https://github.com/abdebek/SciCalc.NetCore</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>A scientific calculator library with significant figures functionality.</description>
+		<description>A library that supports excel-like basic mathematical computations. Scientific computations that require the rules of significant figures are also supported.</description>
 		<releaseNotes>Initial release.</releaseNotes>
-		<tags>calculator scientific significant figures</tags>
+		<tags>fixed-point scientific calculator significant figures</tags>
 	</metadata>
 </package>

@@ -20,7 +20,7 @@ Ensure you have the following installed:
 Clone the repository:
 
 ```bash
-git clone https://github.com/YourUsername/SciCalcDemo.git
+git clone https://github.com/YourUsername/SciCalc.NetCore.git
 cd SciCalcDemo
 ```
 ## Run 

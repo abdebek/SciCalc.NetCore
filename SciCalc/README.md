@@ -1,6 +1,6 @@
-﻿# XLFormulaParser
+﻿# SciCalc - XLFormulaParser
 
-`XLFormulaParser` is a .NET library designed to parse and evaluate Excel-like formulas, including basic mathematical operations, cell references, ranges, and common functions (e.g., `SUM`, `AVERAGE`, `MAX`, etc.). This lightweight parser is ideal for projects that require Excel-like formula processing without depending on Excel itself.
+`SciCalc - XLFormulaParser` is a .NET library designed to parse and evaluate Excel-like formulas, including basic mathematical operations, cell references, ranges, and common functions (e.g., `SUM`, `AVERAGE`, `MAX`, etc.). This lightweight parser is ideal for projects that require Excel-like formula processing without depending on Excel itself.
 
 ## Features
 
@@ -12,20 +12,20 @@
 
 ## Installation
 
-You can install `XLFormulaParser` via NuGet:
+You can install `SciCalc - XLFormulaParser` via NuGet:
 
 ```bash
-dotnet add package XLFormulaParser
+dotnet add package SciCalc
 ```
 Or, add it directly to your .csproj file:
 ```xml
-<PackageReference Include="XLFormulaParser" Version="0.1.0" />
+<PackageReference Include="SciCalc" Version="0.1.0" />
 ```
 ## Basic Setup
 
 ```csharp
 using System;
-using XLFormulaParser;
+using using static SciCalc.Sci;
 
 var parser = new XLFormulaParser();
 
