@@ -24,3 +24,9 @@ A library that supports excel-like basic mathematical computations. Scientific c
 - **Formula Parsing and Evaluation**: Supports mathematical operations, cell references, ranges, and common Excel functions.
 
 Please, refer to the SciCalcDemo project folder for details.
+
+## License
+
+Copyright © 2024 Waanfeetan LLC
+
+This code is licensed under the MIT License. See the LICENSE file for more details.
