@@ -46,7 +46,7 @@ public partial class Sci
         }
 
         /// <summary>
-        /// Divides one number by another with fixed-point precision.
+        /// Divides one number by another using decimal precision.
         /// </summary>
         /// <exception cref="DivideByZeroException">Thrown when <paramref name="b"/> is zero.</exception>
         public static T Divide(T a, T b)
@@ -55,11 +55,29 @@ public partial class Sci
             {
                 throw new DivideByZeroException("Cannot divide by zero.");
             }
-            int scaleA = GetScale(a);
-            int scaleB = GetScale(b);
-            long scaledA = ScaleToLong(a, scaleA);
-            long scaledB = ScaleToLong(b, scaleB);
-            return UnScaleFromLong(scaledA / scaledB, scaleA - scaleB);
+
+            var result = Convert.ToDecimal(a) / Convert.ToDecimal(b);
+
+            var resultScale = GetDecimalScale(result);
+            if (resultScale > 9)
+            {
+                result = Math.Round(result, 9);
+            }
+
+            return T.CreateChecked(result);
+        }
+
+        /// <summary>
+        /// Gets the number of decimal places for a decimal value.
+        /// </summary>
+        /// <param name="value">The decimal value.</param>
+        /// <returns>The number of decimal places.</returns>
+        private static int GetDecimalScale(decimal value)
+        {
+            // This assumes the decimal representation, 
+            // extracting the scale from the bits directly.
+            int[] bits = decimal.GetBits(value);
+            return (bits[3] >> 16) & 0x7F;
         }
 
         /// <summary>
@@ -91,8 +109,7 @@ public partial class Sci
             // Handle regular decimal numbers
             if (value is decimal decimalValue)
             {
-                int[] bits = decimal.GetBits(decimalValue);
-                return (bits[3] >> 16) & 0x7F;
+                return GetDecimalScale(decimalValue);
             }
             else if (value is double || value is float)
             {
