@@ -12,7 +12,7 @@ public static class TestData
             ),
             ( "SUM(A1:A2)",
                 new Dictionary<string, double> { { "A1", 12.1034 }, { "A2", 5.67 } },
-                17.77
+                17.7734
             ),
             (
                 "SUBTRACT(A98:A100)",
@@ -22,7 +22,7 @@ public static class TestData
             (
                 "SUBTRACT(A1:A2)",
                 new Dictionary<string, double> { { "A1", 12.1034 }, { "A2", 5.67 } },
-                6.43
+                6.4334
             ),
             (
                 "PRODUCT(A1:A3)",
@@ -32,7 +32,7 @@ public static class TestData
             (
                 "PRODUCT(A1:A2)",
                 new Dictionary<string, double> { { "A1", 12.1034 }, { "A2", 5.67 } },
-                68.6
+                68.626278
             ),
         };
 

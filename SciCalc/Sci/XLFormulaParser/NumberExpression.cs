@@ -6,9 +6,9 @@ public partial class Sci
     {
         private class NumberExpression : Expression
         {
-            private readonly double value;
+            private readonly decimal value;
 
-            public NumberExpression(double value)
+            public NumberExpression(decimal value)
             {
                 this.value = value;
             }

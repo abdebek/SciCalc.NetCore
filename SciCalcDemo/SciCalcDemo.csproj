@@ -8,14 +8,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SciCalc" Version="0.1.0" />
+		<PackageReference Include="SciCalc" Version="0.1.1" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="README.md">
-	    <PackagePath></PackagePath>
-	    <Pack>true</Pack>
-	  </None>
+		<None Update="README.md">
+			<PackagePath></PackagePath>
+			<Pack>true</Pack>
+		</None>
 	</ItemGroup>
 
 </Project>

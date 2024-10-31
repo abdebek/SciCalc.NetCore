@@ -17,7 +17,7 @@ public static partial class XLFormulaParserTests
 
             Console.WriteLine($"{formula} Result: {result}, Expected: {expected}");
 
-            if (Math.Abs(Convert.ToDouble(result) - expected) > 0.001)
+            if (Math.Abs(Convert.ToDouble(result) - expected) > 0)
             {
                 Console.WriteLine($"Test failed for formula: {formula}");
             }

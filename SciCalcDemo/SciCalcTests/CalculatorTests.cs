@@ -18,12 +18,13 @@ public static class CalculatorTests
     {
         foreach (var (n1, n2) in testCases)
         {
-            var num1 = SignificantNumber.Parse(n1);
-            var num2 = SignificantNumber.Parse(n2);
-            Console.WriteLine($"{n1} + {n2} = {Calculator.Add(num1, num2).Value}");
-            Console.WriteLine($"{n1} - {n2} = {Calculator.Subtract(num1, num2).Value}");
-            Console.WriteLine($"{n1} × {n2} = {Calculator.Multiply(num1, num2).Value}");
-            Console.WriteLine($"{n1} ÷ {n2} = {Calculator.Divide(num1, num2).Value}");
+            var num1 = Convert.ToDouble(n1);
+            var num2 = Convert.ToDouble(n2);
+
+            Console.WriteLine($"{n1} + {n2} = {FixedPointCalculator<double>.Add(num1, num2)}");
+            Console.WriteLine($"{n1} - {n2} = {FixedPointCalculator<double>.Subtract(num1, num2)}");
+            Console.WriteLine($"{n1} × {n2} = {FixedPointCalculator<double>.Multiply(num1, num2)}");
+            Console.WriteLine($"{n1} ÷ {n2} = {FixedPointCalculator<double>.Divide(num1, num2)}");
             Console.WriteLine();
         }
     }

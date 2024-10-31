@@ -1,4 +1,5 @@
-﻿namespace SciCalc;
+﻿using System.Globalization;
+namespace SciCalc;
 
 public partial class Sci
 {
@@ -8,11 +9,11 @@ public partial class Sci
         {
             private readonly string name;
             private readonly List<Expression> arguments;
-            private readonly Dictionary<string, Func<List<double>, double>> functions;
+            private readonly Dictionary<string, Func<List<decimal>, decimal>> functions;
             private readonly Dictionary<string, Func<List<object>, object>> lookupFunctions;
 
             public FunctionExpression(string name, List<Expression> arguments,
-                Dictionary<string, Func<List<double>, double>> functions,
+                Dictionary<string, Func<List<decimal>, decimal>> functions,
                 Dictionary<string, Func<List<object>, object>> lookupFunctions)
             {
                 this.name = name;
@@ -24,7 +25,6 @@ public partial class Sci
             public override object Evaluate(Func<string, object> getCellValue)
             {
                 var evaluatedArgs = arguments.Select(arg => arg.Evaluate(getCellValue)).ToList();
-
                 if (functions.ContainsKey(name))
                 {
                     var numericArgs = FlattenToNumericList(evaluatedArgs);
@@ -34,25 +34,70 @@ public partial class Sci
                 {
                     return lookupFunctions[name](evaluatedArgs);
                 }
-
                 throw new ArgumentException($"Unknown function: {name}");
             }
 
-            private List<double> FlattenToNumericList(List<object> args)
+            private List<decimal> FlattenToNumericList(List<object> evaluatedArgs)
             {
-                var result = new List<double>();
-                foreach (var arg in args)
+                var numericList = new List<decimal>();
+                foreach (var arg in evaluatedArgs)
                 {
-                    if (arg is double d)
+                    if (arg == null)
                     {
-                        result.Add(d);
+                        continue;
                     }
-                    else if (arg is List<object> list)
+
+                    if (arg is IEnumerable<object> list)
                     {
-                        result.AddRange(list.Select(item => Convert.ToDouble(item)));
+                        numericList.AddRange(FlattenToNumericList(list.ToList()));
+                        continue;
+                    }
+
+                    decimal? value = ConvertToDecimal(arg);
+                    if (value.HasValue)
+                    {
+                        numericList.Add(value.Value);
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"Invalid argument type - {arg.GetType()}. Expected decimal, numeric string, or list of numeric values.");
                     }
                 }
-                return result;
+                return numericList;
+            }
+
+            private decimal? ConvertToDecimal(object value)
+            {
+                try
+                {
+                    switch (value)
+                    {
+                        case decimal decimalValue:
+                            return decimalValue;
+                        case int intValue:
+                            return Convert.ToDecimal(intValue);
+                        case float floatValue:
+                            return Convert.ToDecimal(floatValue);
+                        case double doubleValue:
+                            return Convert.ToDecimal(doubleValue);
+                        case string strValue:
+                            if (decimal.TryParse(strValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal parsedDecimal))
+                            {
+                                return parsedDecimal;
+                            }
+                            if (double.TryParse(strValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double parsedDouble))
+                            {
+                                return Convert.ToDecimal(parsedDouble);
+                            }
+                            return null;
+                        default:
+                            return null;
+                    }
+                }
+                catch (OverflowException)
+                {
+                    return null;
+                }
             }
         }
     }

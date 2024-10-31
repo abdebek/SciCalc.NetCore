@@ -2,7 +2,7 @@
 
 public partial class Sci
 {
-    public class Calculator
+    public class ScientificMathCaculator
     {
         /// <summary>
         /// Adds two SignificantNumbers and returns a new SignificantNumber with correct decimal precision.

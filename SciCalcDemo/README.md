@@ -6,7 +6,7 @@
 
 - **Formula Input**: Enter Excel-style formulas directly into the app.
 - **Formula Parsing and Evaluation**: Supports mathematical operations, cell references, ranges, and common Excel functions.
-- **Instant Calculation Results**: Displays evaluation results immediately, allowing for quick testing of complex formulas.
+- **Instant Calculation Results**: Displays evaluation results, allowing for quick testing of complex formulas.
 
 ## Prerequisites
 
