@@ -67,7 +67,7 @@ public partial class Sci
         /// <returns></returns>
         public static decimal Product(List<decimal> values)
         {
-            // If the list is empty, return 1 (neutral element for multiplication).
+            // If the list is empty, return 0 //TODO: find a better way to handle this
             if (values == null || values.Count == 0)
             {
                 return 0m;
