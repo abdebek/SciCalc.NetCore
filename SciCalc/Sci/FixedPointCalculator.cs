@@ -5,12 +5,15 @@ namespace SciCalc;
 public partial class Sci
 {
     /// <summary>
-    /// Provides fixed-point arithmetic operations for high-precision calculations across multiple numeric types.
+    /// Provides fixed-point arithmetic operations for high-precision (9 decimal points) calculations across multiple numeric types.
     /// Supports scientific notation (e.g., 1.23e-4).
     /// </summary>
     /// <typeparam name="T">The numeric type used for calculations.</typeparam>
     public static class FixedPointCalculator<T> where T : INumber<T>
     {
+
+        private static readonly int MaxNumberOfDecimalPlaces = 9;
+
         /// <summary>
         /// Adds two numbers of type <typeparamref name="T"/> with fixed-point precision.
         /// </summary>
@@ -45,7 +48,11 @@ public partial class Sci
             var result = UnScaleFromLong(scaledA * scaledB, scaleA + scaleB);
             var resultScale = GetScale(result);
 
-            return resultScale <= 9 ? result : T.CreateChecked(Math.Round(Convert.ToDecimal(result), 9, MidpointRounding.AwayFromZero));
+            return resultScale <= MaxNumberOfDecimalPlaces ? result :
+                   T.CreateChecked(
+                       Math.Round(Convert.ToDecimal(result),
+                       MaxNumberOfDecimalPlaces, MidpointRounding.AwayFromZero)
+                     );
         }
 
         /// <summary>
@@ -62,7 +69,11 @@ public partial class Sci
             var result = Convert.ToDecimal(a) / Convert.ToDecimal(b);
             var resultScale = GetDecimalScale(result);
 
-            return resultScale <= 9 ? T.CreateChecked(result) : T.CreateChecked(Math.Round(result, 9, MidpointRounding.AwayFromZero));
+            return resultScale <= MaxNumberOfDecimalPlaces ? T.CreateChecked(result) :
+                                T.CreateChecked(
+                                    Math.Round(result, MaxNumberOfDecimalPlaces,
+                                    MidpointRounding.AwayFromZero)
+                                 );
         }
 
         /// <summary>

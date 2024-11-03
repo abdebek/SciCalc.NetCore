@@ -20,7 +20,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="assets\" />
+		<Folder Include="assets\" />
 	</ItemGroup>
 
+	<!-- Uncomment the following for direct library project reference instead of the nugget package (for rapid local development cycles).  -->
+	<!--<ItemGroup>
+		<ProjectReference Include="..\SciCalc\SciCalc.csproj" />
+	</ItemGroup>-->
+
+	<ItemGroup>
+		<None Update="assets\XLMathCopy.xlsx">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 </Project>

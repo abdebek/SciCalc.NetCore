@@ -25,7 +25,7 @@ namespace SciCalcDemo.SciCalcTests
 
         public static void RunManuallyCuratedTests()
         {
-            RunTestCases(TestData.TestCases);
+            RunTestCases(ManualTestData.TestCases);
         }
 
         private static List<(string formula, Dictionary<string, double> cells, double expected)> GenerateTestCasesFromWorkbook()
@@ -71,23 +71,29 @@ namespace SciCalcDemo.SciCalcTests
         {
             CellData.SetCellValues(cells);
             var result = parser.Evaluate(formula, CellData.GetCellValue);
-            double errorPercentage = CalculateErrorPercentage(result, expected);
+            var resultInDouble = RoundTo10Digits(Convert.ToDouble(result));
 
-            DisplayTestResult(formula, result, expected, errorPercentage);
-            CheckTestSuccess(result, expected, formula);
+            double errorPercentage = CalculateErrorPercentage(resultInDouble, expected);
+            DisplayTestResult(formula, resultInDouble, expected, errorPercentage);
+            CheckTestSuccess(resultInDouble, expected, formula);
         }
 
-        private static double CalculateErrorPercentage(object result, double expected) =>
-            expected == 0 ? 0 : Math.Abs((Convert.ToDouble(result) - expected) / expected) * 100;
+        private static double CalculateErrorPercentage(double result, double expected) =>
+            expected == 0 ? 0 : Math.Abs(Math.Abs(result - expected) / expected) * 100;
 
-        private static void DisplayTestResult(string formula, object result, double expected, double errorPercentage)
+        private static void DisplayTestResult(string formula, double result, double expected, double errorPercentage)
         {
             Console.WriteLine($"{formula} Result: {result}, Expected: {expected}, Error Percentage: {errorPercentage}%.");
         }
 
-        private static void CheckTestSuccess(object result, double expected, string formula)
+        private static T RoundTo10Digits<T>(T value) where T : IConvertible
         {
-            if (Math.Abs(Convert.ToDouble(result) - expected) > 0) // Success threshold: > 0.1e-6
+            return Helpers.RoundTo10Digits(value);
+        }
+
+        private static void CheckTestSuccess(double result, double expected, string formula)
+        {
+            if (Math.Abs(result - expected) > 0.1e-6) // Success threshold: > 0.1e-6
             {
                 Console.WriteLine($"Test failed for formula: {formula}");
             }

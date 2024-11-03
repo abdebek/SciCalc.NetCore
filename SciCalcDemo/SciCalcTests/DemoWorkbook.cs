@@ -6,49 +6,61 @@ namespace SciCalcDemo.SciCalcTests;
 
 public class DemoWorkbook
 {
+    private static readonly string ExcelFilePath = Path.Combine(AppContext.BaseDirectory, "assets", "XLMathCopy.xlsx");
+
     public static DataTable ReadExcel()
     {
-        DataTable dtTable = new DataTable();
-        List<string> rowList = new List<string>();
-        ISheet sheet;
-        // Open the Excel file containing the test data copied from the original Excel computation results
-        using (var stream = new FileStream("C:\\Users\\A\\source\\repos\\SciCalc\\SciCalcDemo\\assets\\XLMathCopy.xlsx", FileMode.Open))
+        DataTable dataTable = new DataTable();
+
+        using var stream = new FileStream(ExcelFilePath, FileMode.Open, FileAccess.Read);
+        using var workbook = new XSSFWorkbook(stream);
+        ISheet sheet = workbook.GetSheetAt(0);
+
+        if (sheet == null)
+            throw new Exception("No sheet found in Excel file.");
+
+        AddColumns(sheet, dataTable);
+        AddRows(sheet, dataTable);
+
+        return dataTable;
+    }
+
+    private static void AddColumns(ISheet sheet, DataTable dataTable)
+    {
+        IRow headerRow = sheet.GetRow(0);
+        int cellCount = headerRow.LastCellNum;
+
+        for (int j = 0; j < cellCount; j++)
         {
-            stream.Position = 0;
-            XSSFWorkbook xssWorkbook = new XSSFWorkbook(stream);
-            sheet = xssWorkbook.GetSheetAt(0);
-            IRow headerRow = sheet.GetRow(0);
-            int cellCount = headerRow.LastCellNum;
-            for (int j = 0; j < cellCount; j++)
+            ICell cell = headerRow.GetCell(j);
+            if (cell != null && !string.IsNullOrWhiteSpace(cell.ToString()))
             {
-                ICell cell = headerRow.GetCell(j);
-                if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
-                {
-                    dtTable.Columns.Add(cell.ToString());
-                }
-            }
-            for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++)
-            {
-                IRow row = sheet.GetRow(i);
-                if (row == null) continue;
-                if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-                for (int j = row.FirstCellNum; j < cellCount; j++)
-                {
-                    if (row.GetCell(j) != null)
-                    {
-                        if (!string.IsNullOrEmpty(row.GetCell(j).ToString()) && !string.IsNullOrWhiteSpace(row.GetCell(j).ToString()))
-                        {
-                            rowList.Add(row.GetCell(j).ToString());
-                        }
-                    }
-                }
-                if (rowList.Count > 0)
-                    dtTable.Rows.Add(rowList.ToArray());
-                rowList.Clear();
+                dataTable.Columns.Add(cell.ToString());
             }
         }
+    }
 
-        return dtTable;
+    private static void AddRows(ISheet sheet, DataTable dataTable)
+    {
+        List<string> rowData = new List<string>();
+        int cellCount = sheet.GetRow(0).LastCellNum;
+
+        for (int i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++)
+        {
+            IRow row = sheet.GetRow(i);
+            if (row == null || row.Cells.All(cell => cell.CellType == CellType.Blank))
+                continue;
+
+            rowData.Clear();
+
+            for (int j = row.FirstCellNum; j < cellCount; j++)
+            {
+                ICell cell = row.GetCell(j);
+                rowData.Add(cell?.ToString() ?? string.Empty);
+            }
+
+            dataTable.Rows.Add(rowData.ToArray());
+        }
     }
 
     public static void DisplayData(DataTable table)

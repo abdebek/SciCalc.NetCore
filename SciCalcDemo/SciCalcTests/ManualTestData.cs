@@ -1,6 +1,6 @@
 ﻿namespace SciCalcDemo.SciCalcTests;
 
-public static class TestData
+public static class ManualTestData
 {
     // Define test cases with formula, cell values, and expected result
     public static readonly List<(string formula, Dictionary<string, double> cells, double expected)> TestCases = new()

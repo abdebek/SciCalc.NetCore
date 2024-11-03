@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace SciCalc;
-
 public partial class Sci
 {
     public class SignificantNumber
@@ -19,26 +19,31 @@ public partial class Sci
 
         /// <summary>
         /// Parses a string representation of a number into a SignificantNumber instance.
-        /// Handles scientific notation and calculates significant figures and decimal places.
         /// </summary>
-        /// <param name="number">String representation of the number.</param>
-        /// <returns>Parsed SignificantNumber object.</returns>
         public static SignificantNumber Parse(string number)
         {
             number = number.Trim().ToLower();
-            double parsedValue = double.Parse(number);
+
+            // Handle special case for zero
+            if (number == "0" || number == "0.0" || number == ".0")
+                return new SignificantNumber(0, 1, 0);
+
+            double parsedValue;
             int significantDigits, decimalPlaces;
 
             if (number.Contains('e')) // Scientific notation case
             {
                 var parts = number.Split('e');
                 var mantissa = parts[0];
-                int exponent = int.Parse(parts[1]);
+                int exponent = int.Parse(parts[1], CultureInfo.InvariantCulture);
+
+                parsedValue = double.Parse(number, CultureInfo.InvariantCulture);
                 significantDigits = CountSignificantFigures(mantissa);
-                decimalPlaces = GetDecimalPlaces(mantissa) - exponent;
+                decimalPlaces = CalculateDecimalPlaces(mantissa, exponent);
             }
             else // Regular number
             {
+                parsedValue = double.Parse(number, CultureInfo.InvariantCulture);
                 significantDigits = CountSignificantFigures(number);
                 decimalPlaces = GetDecimalPlaces(number);
             }
@@ -46,33 +51,46 @@ public partial class Sci
             return new SignificantNumber(parsedValue, significantDigits, decimalPlaces);
         }
 
-        /// <summary>
-        /// Counts the number of significant figures in a numeric string.
-        /// </summary>
-        /// <param name="number">String representation of the number.</param>
-        /// <returns>Number of significant figures.</returns>
-        private static int CountSignificantFigures(string number)
+        public static int CountSignificantFigures(string number)
         {
-            number = number.TrimStart('0').Replace(".", "");
-            if (string.IsNullOrEmpty(number) || number == "0") return 0;
+            // Remove decimal point and leading zeros
+            string cleanNumber = number.Replace(".", "").TrimStart('0');
+            if (string.IsNullOrEmpty(cleanNumber)) return 1; // Special case for zero
 
-            int nonZeroCount = Regex.Match(number, @"^[1-9][0-9]*").Length;
-            int trailingZeroCount = number.Contains('.') ? Regex.Match(number, @"(0*)$").Length : 0;
+            // Count all digits for numbers with decimal points
+            if (number.Contains('.'))
+            {
+                return Regex.Replace(cleanNumber, @"[^0-9]", "").Length;
+            }
 
-            return nonZeroCount + trailingZeroCount;
+            // For integers, count up to the last non-zero digit
+            return Regex.Match(cleanNumber, @"^[0-9]*[1-9]").Length;
         }
 
-        /// <summary>
-        /// Gets the count of decimal places in a numeric string.
-        /// </summary>
-        /// <param name="number">String representation of the number.</param>
-        /// <returns>Number of decimal places.</returns>
+        private static int CalculateDecimalPlaces(string mantissa, int exponent)
+        {
+            int mantissaDecimals = GetDecimalPlaces(mantissa);
+            return Math.Max(0, mantissaDecimals - exponent);
+        }
+
         private static int GetDecimalPlaces(string number)
         {
             var parts = number.Split('.');
             return parts.Length > 1 ? parts[1].Length : 0;
         }
 
-        public override string ToString() => Value.ToString($"F{DecimalPlaces}");
+        public override string ToString()
+        {
+            if (Value == 0) return "0";
+
+            // Use scientific notation for very large or small numbers
+            double absValue = Math.Abs(Value);
+            if (absValue < 0.0001 || absValue >= 10000000)
+            {
+                return Value.ToString($"E{DecimalPlaces}", CultureInfo.InvariantCulture);
+            }
+
+            return Value.ToString($"F{DecimalPlaces}", CultureInfo.InvariantCulture);
+        }
     }
 }
