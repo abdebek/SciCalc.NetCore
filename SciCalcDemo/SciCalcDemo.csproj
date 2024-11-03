@@ -9,6 +9,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="NPOI" Version="2.7.1" />
+
+		<!--Comment out the following line for local development and testing, 
+			and add the library project as direct reference instead as shown in section below-->
 		<PackageReference Include="SciCalc" Version="0.1.3" />
 	</ItemGroup>
 
